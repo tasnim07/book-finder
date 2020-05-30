@@ -8,7 +8,10 @@ A search app written purely in Python 3.
 
 
 ## Installation
-- clone this repository and do `cd src`
+- clone this repository.
+- create virtualenv
+- Run `pip install -r requirements.pip`
+- Run `cd src`
 - Run `python app.py`.
 - check at `http://localhost:5000/ping`
 
