@@ -1,6 +1,6 @@
-from index import storage
-from utils import tokenize
-from exceptions import IndexNotFoundError
+from book_finder.index import storage
+from core.utils import tokenize
+from core.exceptions import IndexNotFoundError
 
 
 def search(query):
@@ -20,7 +20,7 @@ def search(query):
     for token in query_tokens:
         token_docs.append(set(storage.get(token, {}).get('documents', [])))
 
-    return set.intersection(*token_docs)
+    return list(set.intersection(*token_docs))
 
 
 def score():
