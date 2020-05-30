@@ -5,6 +5,11 @@ from book_finder import index, search
 app = Flask(__name__)
 
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return 'PONG\n'
+
+
 @app.route('/search', methods=['POST'])
 def get_search():
     body = request.json
