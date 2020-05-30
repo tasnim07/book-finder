@@ -1,8 +1,12 @@
+# in-built imports
 import os
 import json
+import urllib.request
 import collections
+
+# local imports
 from core.utils import tokenize
-from settings import BOOK_DATA_FILEPATH
+from settings import BOOK_DATA_FILEPATH, AUTHOR_API
 
 
 class Storage:
@@ -24,6 +28,8 @@ class Storage:
             Storage.__instance = self
             self.inverted_index = collections.defaultdict(dict)
             self.books = collections.defaultdict(dict)
+            # store mapping of book_id and author name
+            self.authors = {}
         else:
             raise Exception('Cannot instantiate another instance of this class.')  # noqa
 
@@ -95,3 +101,32 @@ def index_book_data():
     index = Index(storage)
 
     index.index(data)
+
+
+def get_author_from_api(book_id):
+    req = urllib.request.Request(
+        AUTHOR_API,
+        data=json.dumps({"book_id": book_id}).encode(),
+        headers={'Content-Type': 'application/json'}, method='POST'
+    )
+    handler = urllib.request.urlopen(req)
+    response = handler.read()
+    try:
+        author_data = json.loads(response)
+        if author_data and author_data.get('author'):
+            return author_data['author']
+        return ''
+    except json.JSONDecodeError:
+        return ''
+
+
+def get_author(book_id):
+    storage = Storage.get_instance()
+    author = storage.authors.get(book_id)
+    if not author:
+        author = get_author_from_api(book_id)
+        # storing the author in the storage,
+        # so that next time we can fetch directly from local storage.
+        storage.authors[book_id] = author
+
+    return author

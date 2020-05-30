@@ -1,4 +1,4 @@
-from book_finder.index import Storage
+from book_finder.index import Storage, get_author
 from core.utils import tokenize
 from core.exceptions import IndexNotFoundError
 from book_finder.scoring import TermFrequencyScore, \
@@ -64,3 +64,25 @@ class Search:
             result.append({'book_id': book_id, 'score': score})
 
         return sorted(result, key=lambda x: x['score'], reverse=True)
+
+
+class APISearch(Search):
+    '''Extends Search class to modify api response.'''
+    def get_search_response(self, scored_result):
+        summaries = []
+        for scored_book in scored_result:
+            book = self.storage_obj.books[scored_book['book_id']]
+            book['author'] = get_author(scored_book['book_id'])
+            book['query'] = self.text
+            summaries.append(book)
+
+        return summaries
+
+
+def get_api_search_result(body):
+    response = []
+    k = int(body.get('k', 3))
+    for query in body['queries']:
+        response.append(APISearch(query, k).get_result())
+
+    return response
