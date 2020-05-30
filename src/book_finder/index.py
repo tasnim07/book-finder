@@ -1,6 +1,7 @@
 import os
 import json
 import collections
+from settings import BOOK_DATA_FILEPATH
 
 
 # this is an storage to keep indexed data
@@ -49,7 +50,6 @@ def remove_stopwords():
 
 
 def index_book_data():
-    BOOK_DATA_FILEPATH = '../data.json'  # put this under .env
     if not os.path.exists(BOOK_DATA_FILEPATH):
         raise FileNotFoundError('book data file not found')
     data = json.load(open(BOOK_DATA_FILEPATH))
