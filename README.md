@@ -5,6 +5,7 @@ A search app written purely in Python 3.
 ## Features
 - Search book by any keyword or combination of keywords.
 - Support multiple search queries in one api call.
+- Supports only 'complete term' search
 
 
 ## Installation
