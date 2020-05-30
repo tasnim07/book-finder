@@ -1,5 +1,26 @@
-def search():
-    pass
+from index import storage
+from utils import tokenize
+from exceptions import IndexNotFoundError
+
+
+def search(query):
+    '''
+    Search the index by tokenizing each word.
+
+    # Args:
+      - query(str) - the text to query for
+    '''
+    if not isinstance(query, str):
+        raise ValueError('query should be str')
+    if not storage:
+        raise IndexNotFoundError()
+    query_tokens = tokenize(query)
+
+    token_docs = []
+    for token in query_tokens:
+        token_docs.append(set(storage.get(token, {}).get('documents', [])))
+
+    return set.intersection(*token_docs)
 
 
 def score():
