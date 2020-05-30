@@ -43,3 +43,6 @@ def test_search_book():
 
     search_result = search.search('man')
     assert search_result == [0, 1, 3]
+
+    search_result = search.search('merchant')
+    assert search_result == [1, 2]
