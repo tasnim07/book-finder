@@ -8,14 +8,14 @@ def test_search_arguments():
     '''search function only supports string input.'''
     case = unittest.TestCase()
     with case.assertRaises(ValueError):
-        search.search(['take your book'])
+        search.Search(['take your book'])
 
 
 def test_search_index_existence():
     '''Test wether the search index defined and populated.'''
     case = unittest.TestCase()
     with case.assertRaises(IndexNotFoundError):
-        search.search('take your book')
+        search.Search('take your book')
 
 
 def test_search_book():
@@ -43,8 +43,8 @@ def test_search_book():
     index_obj = index.Index(storage)
     index_obj.index(test_data)
 
-    search_result = search.search('man')
-    assert search_result == [0, 1, 3]
+    search_obj = search.Search('man')
+    assert search_obj.search() == [0, 1, 3]
 
-    search_result = search.search('merchant')
-    assert search_result == [1, 2]
+    search_obj = search.Search('merchant')
+    assert search_obj.search() == [1, 2]

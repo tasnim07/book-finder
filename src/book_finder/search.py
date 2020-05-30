@@ -1,40 +1,66 @@
 from book_finder.index import Storage
 from core.utils import tokenize
 from core.exceptions import IndexNotFoundError
+from book_finder.scoring import TermFrequencyScore, \
+    InverseDocumentFrequencyScore
 
 
-def search(query):
-    '''
-    Search the index by tokenizing each word.
+class Search:
 
-    # Args:
-      - query(str) - the text to query for
-    '''
-    if not isinstance(query, str):
-        raise ValueError('query should be str')
-    storage = Storage.get_instance()
-    storage = storage.storage
-    if not storage:
-        raise IndexNotFoundError()
+    scoring_classes = [TermFrequencyScore, InverseDocumentFrequencyScore]
 
-    query_tokens = tokenize(query)
-    token_docs = []
-    for token in query_tokens:
-        token_docs.append(set(storage.get(token, {}).get('documents', [])))
+    def __init__(self, text, k=3):
+        '''Args:
+              text (str): text is a search text.
+        '''
+        if not isinstance(text, str):
+            raise ValueError('text should be str')
+        self.storage_obj = Storage.get_instance()
+        if not self.storage_obj.inverted_index:
+            raise IndexNotFoundError()
 
-    return list(set.intersection(*token_docs))
+        self.inverted_index = self.storage_obj.inverted_index
 
+        self.text = text
+        self.k = k
+        self.text_tokens = tokenize(text)
 
-def score():
-    pass
+    def search(self):
+        '''Search the index and get the relevant result.'''
+        if not isinstance(self.text, str):
+            raise ValueError('search text should be str')
 
+        token_docs = []
+        for token in self.text_tokens:
+            token_docs.append(
+                set(self.inverted_index.get(token, {}).get('documents', {}))
+            )
 
-def get_term_frequency():
-    pass
+        return list(set.intersection(*token_docs))
 
+    def get_search_response(self, scored_result):
+        '''prepare response for each book object.'''
+        summaries = []
+        for scored_book in scored_result:
+            book = self.storage_obj.books[scored_book['book_id']]
+            summaries.append(book)
 
-def get_idf():
-    pass
+        return summaries
 
+    def get_result(self):
+        '''Get final result'''
+        search_result = self.search()
+        scored_result = self.calculate_score(search_result)
+        return self.get_search_response(scored_result)[:self.k]
 
-# we can use decorator pattern to calculate score
+    def calculate_score(self, search_result):
+        '''Calculate score of each relevant search result'''
+        # result stores book_id and score mapping
+        result = []
+        for book_id in search_result:
+            score = 0
+            for scoring_class in self.scoring_classes:
+                score += scoring_class().calculate(self.text_tokens, book_id)
+            result.append({'book_id': book_id, 'score': score})
+
+        return sorted(result, key=lambda x: x['score'], reverse=True)
