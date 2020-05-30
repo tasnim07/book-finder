@@ -39,7 +39,9 @@ def test_search_book():
             },
         ]
     }
-    index.index(test_data)
+    storage = index.Storage.get_instance()
+    index_obj = index.Index(storage)
+    index_obj.index(test_data)
 
     search_result = search.search('man')
     assert search_result == [0, 1, 3]

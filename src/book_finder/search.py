@@ -1,4 +1,4 @@
-from book_finder.index import storage
+from book_finder.index import Storage
 from core.utils import tokenize
 from core.exceptions import IndexNotFoundError
 
@@ -12,10 +12,12 @@ def search(query):
     '''
     if not isinstance(query, str):
         raise ValueError('query should be str')
+    storage = Storage.get_instance()
+    storage = storage.storage
     if not storage:
         raise IndexNotFoundError()
-    query_tokens = tokenize(query)
 
+    query_tokens = tokenize(query)
     token_docs = []
     for token in query_tokens:
         token_docs.append(set(storage.get(token, {}).get('documents', [])))
