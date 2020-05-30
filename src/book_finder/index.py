@@ -76,22 +76,6 @@ class Index:
             self.index_book(book)
 
 
-def remove_punctuations(text):
-    pass
-
-
-def process_text():
-    pass
-
-
-def generate_tokens():
-    pass
-
-
-def remove_stopwords():
-    pass
-
-
 def index_book_data():
     if not os.path.exists(BOOK_DATA_FILEPATH):
         raise FileNotFoundError('book data file not found')
