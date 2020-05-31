@@ -16,7 +16,6 @@ class Storage:
     This is an storage to keep inverted index data.
     inverted index structure:
        {'term': {
-           'frequency': 1,
            'documents': {<book_id_1>: <frequency in doc 1>,
                          <book_id_2>: <frequency in doc 2>, ...}
     }}
@@ -59,10 +58,6 @@ class Index:
         summary = book['summary']
         tokens = tokenize(summary)
         for token in tokens:
-            if 'frequency' in self.inverted_index[token]:
-                self.inverted_index[token]['frequency'] += 1
-            else:
-                self.inverted_index[token]['frequency'] = 1
             if 'documents' not in self.inverted_index[token]:
                 self.inverted_index[token]['documents'] = {}
             if book_id not in self.inverted_index[token]['documents']:
